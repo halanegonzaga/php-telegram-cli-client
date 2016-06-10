@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2015 Eric Enold <zyberspace@zyberware.org>
  *
@@ -6,14 +7,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 namespace Zyberspace\Telegram\Cli;
 
 /**
  * php-client for telegram-cli.
  * If you don't need the command-wrappers in this class or want to make your own, use the RawClient-class. :)
  */
-class Client extends RawClient
-{
+class Client extends RawClient {
+
     /**
      * Sets status as online.
      *
@@ -21,8 +23,7 @@ class Client extends RawClient
      *
      * @uses exec()
      */
-    public function setStatusOnline()
-    {
+    public function setStatusOnline() {
         return $this->exec('status_online');
     }
 
@@ -33,8 +34,7 @@ class Client extends RawClient
      *
      * @uses exec()
      */
-    public function setStatusOffline()
-    {
+    public function setStatusOffline() {
         return $this->exec('status_offline');
     }
 
@@ -46,8 +46,7 @@ class Client extends RawClient
      *
      * @return boolean true on success, false otherwise
      */
-    public function sendTyping($peer)
-    {
+    public function sendTyping($peer) {
         return $this->exec('send_typing ' . $this->escapePeer($peer));
     }
 
@@ -63,8 +62,7 @@ class Client extends RawClient
      * @uses escapePeer()
      * @uses escapeStringArgument()
      */
-    public function msg($peer, $msg)
-    {
+    public function msg($peer, $msg) {
         $peer = $this->escapePeer($peer);
         $msg = $this->escapeStringArgument($msg);
         return $this->exec('msg ' . $peer . ' ' . $msg);
@@ -79,10 +77,9 @@ class Client extends RawClient
      *
      * @return boolean true on success, false otherwise
      */
-    public function broadcast(array $userList, $msg)
-    {
+    public function broadcast(array $userList, $msg) {
         return $this->exec('broadcast ' . $this->formatPeerList($userList) . ' '
-            . $this->escapeStringArgument($msg));
+                        . $this->escapeStringArgument($msg));
     }
 
     /**
@@ -98,14 +95,12 @@ class Client extends RawClient
      * @uses escapeStringArgument()
      * @uses formatPeerList()
      */
-    public function createGroupChat($chatTitle, $userList)
-    {
+    public function createGroupChat($chatTitle, $userList) {
         if (count($userList) <= 0) {
             return false;
         }
 
-        return $this->exec('create_group_chat', $this->escapeStringArgument($chatTitle),
-            $this->formatPeerList($userList));
+        return $this->exec('create_group_chat', $this->escapeStringArgument($chatTitle), $this->formatPeerList($userList));
     }
 
     /**
@@ -118,8 +113,7 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function chatInfo($chat)
-    {
+    public function chatInfo($chat) {
         return $this->exec('chat_info', $this->escapePeer($chat));
     }
 
@@ -135,8 +129,7 @@ class Client extends RawClient
      * @uses escapePeer()
      * @uses escapeStringArgument()
      */
-    public function renameChat($chat, $newChatTitle)
-    {
+    public function renameChat($chat, $newChatTitle) {
         return $this->exec('rename_chat', $this->escapePeer($chat), $this->escapeStringArgument($newChatTitle));
     }
 
@@ -153,10 +146,8 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function chatAddUser($chat, $user, $numberOfMessagesToFoward = 100)
-    {
-        return $this->exec('chat_add_user', $this->escapePeer($chat), $this->escapePeer($user),
-            (int) $numberOfMessagesToFoward);
+    public function chatAddUser($chat, $user, $numberOfMessagesToFoward = 100) {
+        return $this->exec('chat_add_user', $this->escapePeer($chat), $this->escapePeer($user), (int) $numberOfMessagesToFoward);
     }
 
     /**
@@ -170,8 +161,7 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function chatDeleteUser($chat, $user)
-    {
+    public function chatDeleteUser($chat, $user) {
         return $this->exec('chat_del_user', $this->escapePeer($chat), $this->escapePeer($user));
     }
 
@@ -185,10 +175,9 @@ class Client extends RawClient
      *
      * @uses exec()
      */
-    public function setProfileName($firstName, $lastName)
-    {
+    public function setProfileName($firstName, $lastName) {
         return $this->exec('set_profile_name ' . $this->escapeStringArgument($firstName) . ' '
-            . $this->escapeStringArgument($lastName));
+                        . $this->escapeStringArgument($lastName));
     }
 
     /**
@@ -205,15 +194,14 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapeStringArgument()
      */
-    public function addContact($phoneNumber, $firstName, $lastName)
-    {
+    public function addContact($phoneNumber, $firstName, $lastName) {
         $phoneNumber = preg_replace('%[^0-9]%', '', (string) $phoneNumber);
         if (empty($phoneNumber)) {
             return false;
         }
 
         return $this->exec('add_contact ' . $phoneNumber . ' ' . $this->escapeStringArgument($firstName)
-            . ' ' . $this->escapeStringArgument($lastName));
+                        . ' ' . $this->escapeStringArgument($lastName));
     }
 
     /**
@@ -228,10 +216,9 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapeStringArgument()
      */
-    public function renameContact($contact, $firstName, $lastName)
-    {
+    public function renameContact($contact, $firstName, $lastName) {
         return $this->exec('rename_contact ' . $this->escapePeer($contact)
-            . ' ' . $this->escapeStringArgument($firstName) . ' ' . $this->escapeStringArgument($lastName));
+                        . ' ' . $this->escapeStringArgument($firstName) . ' ' . $this->escapeStringArgument($lastName));
     }
 
     /**
@@ -244,11 +231,9 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function deleteContact($contact)
-    {
+    public function deleteContact($contact) {
         return $this->exec('del_contact ' . $this->escapePeer($contact));
     }
-
 
     /**
      * Blocks a user .
@@ -260,8 +245,7 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function blockUser($user)
-    {
+    public function blockUser($user) {
         return $this->exec('block_user ' . $this->escapePeer($user));
     }
 
@@ -275,8 +259,7 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function unblockUser($user)
-    {
+    public function unblockUser($user) {
         return $this->exec('unblock_user ' . $this->escapePeer($user));
     }
 
@@ -290,8 +273,7 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function markRead($peer)
-    {
+    public function markRead($peer) {
         return $this->exec('mark_read ' . $this->escapePeer($peer));
     }
 
@@ -304,8 +286,7 @@ class Client extends RawClient
      *
      * @see getUserInfo()
      */
-    public function getContactList()
-    {
+    public function getContactList() {
         return $this->exec('contact_list');
     }
 
@@ -319,8 +300,7 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function getUserInfo($user)
-    {
+    public function getUserInfo($user) {
         return $this->exec('user_info ' . $this->escapePeer($user));
     }
 
@@ -333,8 +313,7 @@ class Client extends RawClient
      *
      * @see getUserInfo()
      */
-    public function getDialogList()
-    {
+    public function getDialogList() {
         return $this->exec('dialog_list');
     }
 
@@ -353,8 +332,7 @@ class Client extends RawClient
      * @uses exec()
      * @uses escapePeer()
      */
-    public function getHistory($peer, $limit = null, $offset = null)
-    {
+    public function getHistory($peer, $limit = null, $offset = null) {
         if ($limit !== null) {
             $limit = (int) $limit;
             if ($limit < 1) { //if limit is lesser than 1, telegram-cli crashes
@@ -384,8 +362,7 @@ class Client extends RawClient
      * @uses escapePeer()
      * @uses formatFileName()
      */
-    public function sendPicture($peer, $path)
-    {
+    public function sendPicture($peer, $path) {
         $peer = $this->escapePeer($peer);
         $formattedPath = $this->formatFileName($path);
 
@@ -403,11 +380,22 @@ class Client extends RawClient
      * @uses escapePeer()
      * @uses formatFileName()
      */
-    public function sendFile($peer, $path)
-    {
+    public function sendFile($peer, $path) {
         $peer = $this->escapePeer($peer);
         $formattedPath = $this->formatFileName($path);
 
         return $this->exec('send_file ' . $peer . ' ' . $formattedPath);
     }
+
+    /**
+     * Poll Updates
+     *
+     * @return array
+     *
+     * @uses exec()
+     */
+    public function getUpdates() {
+        return $this->exec('main_session');
+    }
+
 }
