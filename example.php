@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2015 Eric Enold <zyberspace@zyberware.org>
  *
@@ -7,9 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 require('vendor/autoload.php');
-$telegram = new \Zyberspace\Telegram\Cli\Client('unix:///tmp/tg.sck');
+$telegram = new \Zyberspace\Telegram\Cli\Client('tcp://127.0.0.1:3128');
 
-$contactList = $telegram->getContactList();
-var_dump($contactList);
-
-var_dump($telegram->msg($contactList[0]->print_name, '"Te\'st"' . "\n" . time()));
+do {
+    
+} while ($continua = true);

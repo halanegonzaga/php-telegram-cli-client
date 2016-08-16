@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2015 Eric Enold <zyberspace@zyberware.org>
  *
@@ -6,14 +7,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 namespace Zyberspace\Telegram\Cli;
 
 /**
  * Raw part of the php-client for telegram-cli.
  * Takes care of the socket-connection and some helper-methods.
  */
-class RawClient
-{
+class RawClient {
+
     /**
      * The file handler for the socket-connection
      *
@@ -43,8 +45,7 @@ class RawClient
      *
      * @throws ClientException Throws an exception if no connection can be established.
      */
-    public function __construct($remoteSocket)
-    {
+    public function __construct($remoteSocket) {
         $this->_fp = stream_socket_client($remoteSocket);
         if ($this->_fp === false) {
             throw new ClientException('Could not connect to socket "' . $remoteSocket . '"');
@@ -54,8 +55,7 @@ class RawClient
     /**
      * Closes the connection to the telegram-cli.
      */
-    public function __destruct()
-    {
+    public function __destruct() {
         fclose($this->_fp);
     }
 
@@ -66,47 +66,26 @@ class RawClient
      *
      * @return object|boolean Returns the answer as a json-object or true on success, false if there was an error.
      */
-    public function exec($command)
-    {
+    public function exec($command) {
+        echo $command . PHP_EOL;
         $command = implode(' ', func_get_args());
 
         fwrite($this->_fp, str_replace("\n", '\n', $command) . PHP_EOL);
 
-        $answer = fgets($this->_fp); //"ANSWER $bytes" or false if an error occurred
+        $answer = fgets($this->_fp);
         if (is_string($answer)) {
             if (substr($answer, 0, 7) === 'ANSWER ') {
-                $bytes = ((int) substr($answer, 7)) + 1; //+1 because the json-return seems to miss one byte
+                $bytes = ((int) substr($answer, 7) + 1);
                 if ($bytes > 0) {
-                    $bytesRead = 0;
-                    $jsonString = '';
-
-                    //Run fread() till we have all the bytes we want
-                    //(as fread() can only read a maximum of 8192 bytes from a read-buffered stream at once)
-                    do {
-                        $jsonString .= fread($this->_fp, $bytes - $bytesRead);
-                        $bytesRead = strlen($jsonString);
-                    } while ($bytesRead < $bytes);
-
+                    $jsonString = fread($this->_fp, $bytes);
                     $json = json_decode($jsonString);
-
-                    if (!isset($json->error)) {
-                        //Reset error-message and error-code
-                        $this->_errorMessage = null;
-                        $this->_errorCode = null;
-
-                        //For "status_online" and "status_offline"
-                        if (isset($json->result) && $json->result === 'SUCCESS') {
-                            return true;
-                        }
-
-                        //Return json-object
-                        return $json;
-                    } else {
-                        $this->_errorMessage = $json->error;
-                        $this->_errorCode = $json->error_code;
-                    }
+                    return $json;
+                } else {
+                    return false;
                 }
             }
+        } else {
+            return false;
         }
 
         return false;
@@ -117,8 +96,7 @@ class RawClient
      *
      * @return string|null The error-message retrieved from telegram-cli or null if there was no error.
      */
-    public function getErrorMessage()
-    {
+    public function getErrorMessage() {
         return $this->_errorMessage;
     }
 
@@ -127,8 +105,7 @@ class RawClient
      *
      * @return string|null The error-message retrieved from telegram-cli or null if there was no error.
      */
-    public function getErrorCode()
-    {
+    public function getErrorCode() {
         return $this->_errorCode;
     }
 
@@ -140,8 +117,7 @@ class RawClient
      *
      * @return string The escaped command enclosed by double-quotes
      */
-    public function escapeStringArgument($argument)
-    {
+    public function escapeStringArgument($argument) {
         return '"' . addslashes($argument) . '"';
     }
 
@@ -152,8 +128,7 @@ class RawClient
      *
      * @return string The escaped peer
      */
-    public function escapePeer($peer)
-    {
+    public function escapePeer($peer) {
         return str_replace(' ', '_', $peer);
     }
 
@@ -167,8 +142,7 @@ class RawClient
      *
      * @uses escapePeer()
      */
-    public function formatPeerList(array $peerList)
-    {
+    public function formatPeerList(array $peerList) {
         return implode(' ', array_map(array($this, 'escapePeer'), $peerList));
     }
 
@@ -179,8 +153,8 @@ class RawClient
      *
      * @return string The absolute path to the file
      */
-    public function formatFileName($fileName)
-    {
+    public function formatFileName($fileName) {
         return $this->escapeStringArgument(realpath($fileName));
     }
+
 }
